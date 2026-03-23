@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct PoolTableBookingApp: App {
+    @State private var authVM = AuthViewModel()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(authVM)
+                .task { authVM.checkExistingCredential() }
         }
     }
 }

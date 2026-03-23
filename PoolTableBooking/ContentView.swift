@@ -2,21 +2,28 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var bookingManager = BookingManager()
-    
+    @Environment(AuthViewModel.self) var authVM
+
     var body: some View {
-        TabView {
-            HomeView()
-                .tabItem {
-                    Label("Tables", systemImage: "rectangle.grid.2x2.fill")
-                }
-            
-            MyBookingsView()
-                .tabItem {
-                    Label("My Bookings", systemImage: "calendar.badge.clock")
-                }
+        @Bindable var vm = authVM
+        if vm.isAuthenticated {
+            TabView {
+                HomeView()
+                    .tabItem {
+                        Label("Tables", systemImage: "rectangle.grid.2x2.fill")
+                    }
+
+                MyBookingsView()
+                    .tabItem {
+                        Label("My Bookings", systemImage: "calendar.badge.clock")
+                    }
+            }
+            .environmentObject(bookingManager)
+            .tint(Color(hex: "00853E"))
+        } else {
+            AuthView()
+                .animation(.easeInOut, value: vm.isAuthenticated)
         }
-        .environmentObject(bookingManager)
-        .tint(Color(hex: "00853E"))
     }
 }
 
@@ -48,4 +55,5 @@ extension Color {
 
 #Preview {
     ContentView()
+        .environment(AuthViewModel())
 }

@@ -2,10 +2,12 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject var bookingManager: BookingManager
+    @Environment(AuthViewModel.self) var authVM
     @State private var selectedDate = Date()
     @State private var selectedTable: Int? = nil
     @State private var showingBooking = false
-    
+    @State private var showingSignOutAlert = false
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -49,6 +51,23 @@ struct HomeView: View {
             }
             .background(Color.gray.opacity(0.1))
             .navigationTitle("UNT Pool Tables")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showingSignOutAlert = true
+                    } label: {
+                        Image(systemName: "person.circle")
+                            .font(.title3)
+                            .foregroundColor(Color(hex: "00853E"))
+                    }
+                }
+            }
+            .alert("Sign Out?", isPresented: $showingSignOutAlert) {
+                Button("Sign Out", role: .destructive) { authVM.signOut() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("You'll need to sign in again to make bookings.")
+            }
             .sheet(isPresented: $showingBooking) {
                 if let table = selectedTable {
                     BookingView(tableNumber: table, date: selectedDate)
@@ -132,4 +151,5 @@ struct TableCardView: View {
 #Preview {
     HomeView()
         .environmentObject(BookingManager())
+        .environment(AuthViewModel())
 }
